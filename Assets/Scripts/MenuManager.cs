@@ -45,8 +45,9 @@ public enum screen
 {
     None = -1,
     Loading = 0,
-    Main = 1,
-    Add = 2,
-    Edit = 3,
-    Settings = 4,
+    Login = 1,
+    Main = 2,
+    Add = 3,
+    Edit = 4,
+    Settings = 5,
 }

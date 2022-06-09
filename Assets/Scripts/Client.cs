@@ -42,7 +42,12 @@ public class Client : MonoBehaviour
         {
             clientId = reader.GetInt();
             server = peer;
-            MenuManager.getInstance.ChangeScreen(screen.Main);
+            MenuManager.getInstance.ChangeScreen(screen.Login);
+        }
+        else if (packet == Packets.Login)
+        {
+            RequestResponse response = (RequestResponse)reader.GetUShort();
+            LoginScreen.getInstance.Response(response);
         }
     }
 
@@ -53,9 +58,26 @@ public class Client : MonoBehaviour
 
         server.Send(writer, method);
     }
+
+    public void Login(string username, string password)
+    {
+        NetDataWriter writer = new NetDataWriter();
+        writer.Put((ushort)Packets.Login);
+        writer.Put(username);
+        writer.Put(password);
+
+        SendPacket(writer, DeliveryMethod.ReliableOrdered);
+    }
 }
 
 public enum Packets
 {
     Welcome = 0,
+    Login = 1,
+}
+
+public enum RequestResponse
+{
+    OK = 0,
+    Error = 1,
 }
