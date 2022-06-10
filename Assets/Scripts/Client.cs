@@ -47,6 +47,19 @@ public class Client : MonoBehaviour
         else if (packet == Packets.Login)
         {
             RequestResponse response = (RequestResponse)reader.GetUShort();
+            if (response == RequestResponse.OK)
+            {
+                Dictionary<string, string> settings = new Dictionary<string, string>();
+                int count = reader.GetInt();
+                for (int i = 0; i < count; i++)
+                {
+                    string key = reader.GetString();
+                    string value = reader.GetString();
+                    settings.Add(key, value);
+                }
+                SettingsScreen.getInstance.SetSettings(settings);
+            }
+
             LoginScreen.getInstance.Response(response);
         }
     }
