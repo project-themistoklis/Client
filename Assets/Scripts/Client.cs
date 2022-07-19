@@ -81,12 +81,22 @@ public class Client : MonoBehaviour
 
         SendPacket(writer, DeliveryMethod.ReliableOrdered);
     }
+
+    public void SendImage(string base64)
+    {
+        NetDataWriter writer = new NetDataWriter();
+        writer.Put((ushort)Packets.Image);
+        writer.Put(base64);
+
+        SendPacket(writer, DeliveryMethod.Unreliable);
+    }
 }
 
 public enum Packets
 {
     Welcome = 0,
     Login = 1,
+    Image = 2,
 }
 
 public enum RequestResponse
