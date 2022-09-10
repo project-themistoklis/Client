@@ -24,7 +24,7 @@ function LoginPage(props: any) {
   const useEffectHandler = async () => {
     const resp = await axios.get(webServerUrl + "/user_has_pin", {
       params: { uuid: user.uuid },
-      Headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
     });
 
     if (resp.data.success) {
