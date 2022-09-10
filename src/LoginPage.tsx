@@ -24,6 +24,7 @@ function LoginPage(props: any) {
   const useEffectHandler = async () => {
     const resp = await axios.get(webServerUrl + "/user_has_pin", {
       params: { uuid: user.uuid },
+      Headers: { "Content-Type": "application/json" },
     });
 
     if (resp.data.success) {
@@ -35,9 +36,15 @@ function LoginPage(props: any) {
         localStorage.getItem(storage_prefix + "password") &&
         localStorage.getItem(storage_prefix + "saveCreds")
       ) {
-        setUsername(xor(localStorage.getItem(storage_prefix + "username") + "", xor_key));
-        setUsername(xor(localStorage.getItem(storage_prefix + "password") + "", xor_key));
-        setSaveCreds(localStorage.getItem(storage_prefix + "saveCreds") === "true");
+        setUsername(
+          xor(localStorage.getItem(storage_prefix + "username") + "", xor_key)
+        );
+        setUsername(
+          xor(localStorage.getItem(storage_prefix + "password") + "", xor_key)
+        );
+        setSaveCreds(
+          localStorage.getItem(storage_prefix + "saveCreds") === "true"
+        );
       }
     }
   };
@@ -68,7 +75,10 @@ function LoginPage(props: any) {
       if (saveCreds) {
         localStorage.setItem(storage_prefix + "username", xor(temp, xor_key));
         localStorage.setItem(storage_prefix + "password", xor(temp2, xor_key));
-        localStorage.setItem(storage_prefix + "saveCreds", saveCreds ? "true" : "false");
+        localStorage.setItem(
+          storage_prefix + "saveCreds",
+          saveCreds ? "true" : "false"
+        );
       } else {
         localStorage.removeItem(storage_prefix + "username");
         localStorage.removeItem(storage_prefix + "password");
@@ -111,37 +121,49 @@ function LoginPage(props: any) {
         {hasPin ? (
           <div>
             {" "}
-            <label>PIN</label><br/>
+            <label>PIN</label>
+            <br />
             <input
               type="text"
               value={pin}
               onChange={(e) => setPin(e.target.value)}
               placeholder="Pin"
-            /><br/><br/>
+            />
+            <br />
+            <br />
             <button onClick={() => loginWithPin()}>Login</button>
           </div>
         ) : (
           <div>
             {" "}
-            <label>Username</label><br/>
+            <label>Username</label>
+            <br />
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Username"
-            /><br/><br/>
-            <label>Password</label><br/>
+            />
+            <br />
+            <br />
+            <label>Password</label>
+            <br />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-            /><br/><br/>
+            />
+            <br />
+            <br />
             <input
               type="checkbox"
               checked={saveCreds}
               onChange={(e) => setSaveCreds(e.target.checked)}
-            /> <label>Save</label><br/><br/>
+            />{" "}
+            <label>Save</label>
+            <br />
+            <br />
             <button onClick={() => login()}>Login</button>
           </div>
         )}

@@ -1,3 +1,4 @@
+//@ts-ignore
 import axios from "axios";
 import React from "react";
 import { connect } from "socket.io-client";
@@ -18,6 +19,10 @@ socket.on("disconnect", () => {
 });
 socket.on("data", (data) => {
   console.log("received data:", data);
+});
+socket.on("fire_detected", (data) => {
+  const fireData = data.info;
+  console.log("fire detected:", fireData);
 });
 
 export const disconnect = () => {
