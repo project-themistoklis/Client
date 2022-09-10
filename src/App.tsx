@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import LoginPage from "./LoginPage";
 import MainPage from "./MainPage";
-import { socket, SocketContext } from "./socketio_client";
+import { socket, SocketContext } from "./handlers/socketio_client";
 import { generateUuid } from "./utils";
 import { storage_prefix } from "./constants";
 

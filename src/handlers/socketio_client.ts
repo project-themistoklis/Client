@@ -2,7 +2,7 @@
 import axios from "axios";
 import React from "react";
 import { connect } from "socket.io-client";
-import { ip, port, webServerUrl } from "./constants";
+import { ip, port, webServerUrl } from "../constants";
 
 export const socket = connect(`http://${ip}:${port}`, {
   withCredentials: true,
