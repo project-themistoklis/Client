@@ -27,6 +27,8 @@ function LoginPage(props: any) {
       headers: { "Content-Type": "application/json" },
     });
 
+    console.log(resp.data);
+
     if (resp.data.success) {
       setHasPin(true);
     } else {
@@ -70,6 +72,7 @@ function LoginPage(props: any) {
 
     setUsername("");
     setPassword("");
+    console.log("login resp:", resp.data);
 
     if (resp.data.success) {
       if (saveCreds) {
