@@ -17,16 +17,18 @@ function App() {
   const [user, setUser] = useState({ username: "", settings: {}, uuid: "" });
   const [loggedIn, setLoggedIn] = useState(false);
 
-  useEffect(() => {
+  const initUser = () => {
+    setUser({ username: "", settings: {}, uuid: "" });
     let uuid = localStorage.getItem(storage_prefix + "uuid");
     if (!uuid || uuid?.length <= 0) {
       uuid = generateUuid();
       localStorage.setItem(storage_prefix + "uuid", uuid as any);
     }
     user.uuid = uuid as any;
+  };
 
-    setLoggedIn(user.username?.length > 0);
-    console.log("loggedIn", loggedIn, "username:", user.username?.length);
+  useEffect(() => {
+    initUser();
   }, []);
 
   return (
@@ -41,7 +43,12 @@ function App() {
                 }}
               />
             ) : (
-              <MainPage />
+              <MainPage
+                disconnectHandler={() => {
+                  initUser();
+                  setLoggedIn(false);
+                }}
+              />
             )}
           </header>
         </UserContext.Provider>

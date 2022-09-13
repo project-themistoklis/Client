@@ -22,6 +22,52 @@ function LoginPage(props: any) {
   }, []);
 
   const useEffectHandler = async () => {
+    const isLoggedIn =
+      localStorage.getItem(storage_prefix + "is_logged_in") === "true";
+    if (isLoggedIn) {
+      const isPin =
+        localStorage.getItem(storage_prefix + "is_stored_pin") === "true";
+      const username = xor(
+        localStorage.getItem(storage_prefix + "stored_username") as any,
+        xor_key
+      );
+      const password = xor(
+        localStorage.getItem(storage_prefix + "stored_password") as any,
+        xor_key
+      );
+      const uuid = xor(
+        localStorage.getItem(storage_prefix + "stored_uuid") as any,
+        xor_key
+      );
+      if (username && password) {
+        if (!isPin) {
+          const resp = await axios.post(webServerUrl + "/login", {
+            username: username,
+            password: password,
+          });
+
+          if (resp.data.success) {
+            user.username = username;
+            user.settings = resp.data.settings;
+            user.uuid = resp.data.uuid;
+            props.loginHandler();
+          }
+        } else {
+          const resp = await axios.post(webServerUrl + "/loginWithPin", {
+            uuid: uuid,
+            pin: password,
+          });
+
+          if (resp.data.success) {
+            user.uuid = uuid;
+            user.username = resp.data.info;
+            user.settings = resp.data.settings;
+            props.loginHandler();
+          }
+        }
+      }
+    }
+
     const resp = await axios.get(webServerUrl + "/user_has_pin", {
       params: { uuid: user.uuid },
       headers: { "Content-Type": "application/json" },
@@ -75,6 +121,17 @@ function LoginPage(props: any) {
     console.log("login resp:", resp.data);
 
     if (resp.data.success) {
+      localStorage.setItem(storage_prefix + "is_logged_in", "true");
+      localStorage.setItem(storage_prefix + "is_stored_pin", "false");
+      localStorage.setItem(
+        storage_prefix + "stored_username",
+        xor(temp, xor_key)
+      );
+      localStorage.setItem(
+        storage_prefix + "stored_password",
+        xor(temp2, xor_key)
+      );
+
       if (saveCreds) {
         localStorage.setItem(storage_prefix + "username", xor(temp, xor_key));
         localStorage.setItem(storage_prefix + "password", xor(temp2, xor_key));
@@ -103,13 +160,35 @@ function LoginPage(props: any) {
   };
 
   const loginWithPin = async () => {
+    const _pin = pin;
+
+    if (!pin) {
+      return;
+    }
+
+    setPin("");
     const resp = await axios.post(webServerUrl + "/loginWithPin", {
       uuid: user.uuid,
-      pin: pin,
+      pin: _pin,
     });
 
     if (resp.data.success) {
+      user.username = resp.data.info;
       user.settings = resp.data.settings;
+      localStorage.setItem(storage_prefix + "is_logged_in", "true");
+      localStorage.setItem(storage_prefix + "is_stored_pin", "true");
+      localStorage.setItem(
+        storage_prefix + "stored_username",
+        xor(resp.data.info, xor_key)
+      );
+      localStorage.setItem(
+        storage_prefix + "stored_password",
+        xor(_pin, xor_key)
+      );
+      localStorage.setItem(
+        storage_prefix + "stored_uuid",
+        xor(user.uuid, xor_key)
+      );
       console.log("logged in");
       props.loginHandler();
     } else {

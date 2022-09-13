@@ -1,30 +1,24 @@
 import "./App.css";
 import { UserContext } from "./App";
-import { useContext, useState } from "react";
-import axios from "axios";
+import { useContext } from "react";
+import { storage_prefix } from "./constants";
 
-function MainPage() {
-  const [pin, setPin] = useState("");
-
+function MainPage(props: any) {
   const user = useContext(UserContext);
 
-  const _setPin = async () => {
-    const resp = await axios.post(process.env.SERVER_URL + "/setPin", {
-      username: user.username,
-      pin: pin,
-      uuid: user.uuid,
-    });
-
-    if (resp.data.success) {
-    } else {
-      console.log(resp.data.error);
-    }
+  const disconnect = async () => {
+    localStorage.removeItem(storage_prefix + "is_logged_in");
+    localStorage.removeItem(storage_prefix + "is_stored_pin");
+    localStorage.removeItem(storage_prefix + "stored_username");
+    localStorage.removeItem(storage_prefix + "stored_password");
+    localStorage.removeItem(storage_prefix + "stored_uuid");
+    props.disconnectHandler();
   };
 
   return (
     <div className="App">
       <header className="App-header">
-        <button>Logged In</button>
+        <button onClick={() => disconnect()}>Disconnect</button>
       </header>
     </div>
   );
