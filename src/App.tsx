@@ -7,6 +7,7 @@ import { socket, SocketContext } from "./handlers/socketio_client";
 import { generateUuid } from "./utils";
 import { storage_prefix } from "./constants";
 import near_handler from "./handlers/near_handler";
+import Map from "./WorldMap";
 
 export const UserContext = React.createContext({
   username: "",
@@ -17,6 +18,7 @@ export const UserContext = React.createContext({
 function App() {
   const [user, setUser] = useState({ username: "", settings: {}, uuid: "" });
   const [loggedIn, setLoggedIn] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   const initUser = () => {
     let uuid = localStorage.getItem(storage_prefix + "uuid");
@@ -42,11 +44,33 @@ function App() {
         <UserContext.Provider value={user}>
           <header className="App-header">
             {loggedIn === false ? (
-              <LoginPage
-                loginHandler={(res: boolean) => {
-                  setLoggedIn(res);
-                }}
-              />
+              <div>
+                {showMap === false ? (
+                  <div>
+                    <LoginPage
+                      loginHandler={(res: boolean) => {
+                        setLoggedIn(res);
+                      }}
+                    />
+                    <br />
+                    <button
+                      onClick={() => {
+                        setShowMap(true);
+                      }}
+                    >
+                      Show Map
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <Map
+                      back={() => {
+                        setShowMap(false);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             ) : (
               <MainPage
                 disconnectHandler={() => {
