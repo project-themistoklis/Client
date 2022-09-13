@@ -6,6 +6,7 @@ import MainPage from "./MainPage";
 import { socket, SocketContext } from "./handlers/socketio_client";
 import { generateUuid } from "./utils";
 import { storage_prefix } from "./constants";
+import near_handler from "./handlers/near_handler";
 
 export const UserContext = React.createContext({
   username: "",
@@ -18,7 +19,6 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
 
   const initUser = () => {
-    setUser({ username: "", settings: {}, uuid: "" });
     let uuid = localStorage.getItem(storage_prefix + "uuid");
     if (!uuid || uuid?.length <= 0) {
       uuid = generateUuid();
@@ -27,8 +27,13 @@ function App() {
     user.uuid = uuid as any;
   };
 
+  const initNear = async () => {
+    //new near_handler();
+  };
+
   useEffect(() => {
     initUser();
+    initNear();
   }, []);
 
   return (
@@ -45,6 +50,7 @@ function App() {
             ) : (
               <MainPage
                 disconnectHandler={() => {
+                  setUser({ username: "", settings: {}, uuid: "" });
                   initUser();
                   setLoggedIn(false);
                 }}
