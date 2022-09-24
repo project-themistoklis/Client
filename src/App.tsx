@@ -6,17 +6,23 @@ import MainPage from "./MainPage";
 import { socket, SocketContext } from "./handlers/socketio_client";
 import { generateUuid } from "./utils";
 import { storage_prefix } from "./constants";
-import near_handler from "./handlers/near_handler";
 import Map from "./WorldMap";
+import { wallet } from "./main";
 
 export const UserContext = React.createContext({
   username: "",
   settings: {},
   uuid: "",
+  nearSignedIn: false,
 });
 
 function App() {
-  const [user, setUser] = useState({ username: "", settings: {}, uuid: "" });
+  const [user, setUser] = useState({
+    username: "",
+    settings: {},
+    uuid: "",
+    nearSignedIn: false,
+  });
   const [loggedIn, setLoggedIn] = useState(false);
   const [showMap, setShowMap] = useState(false);
 
@@ -29,14 +35,22 @@ function App() {
     user.uuid = uuid as any;
   };
 
-  const initNear = async () => {
-    //new near_handler();
-  };
-
   useEffect(() => {
     initUser();
-    initNear();
   }, []);
+
+  useEffect(() => {
+    if (loggedIn) {
+      handleWallet();
+    } else {
+      user.nearSignedIn = false;
+    }
+  }, [loggedIn]);
+
+  const handleWallet = async () => {
+    const isSignedIn = await wallet.startUp();
+    user.nearSignedIn = isSignedIn;
+  };
 
   return (
     <div className="App">
@@ -74,7 +88,12 @@ function App() {
             ) : (
               <MainPage
                 disconnectHandler={() => {
-                  setUser({ username: "", settings: {}, uuid: "" });
+                  setUser({
+                    username: "",
+                    settings: {},
+                    uuid: "",
+                    nearSignedIn: false,
+                  });
                   initUser();
                   setLoggedIn(false);
                 }}

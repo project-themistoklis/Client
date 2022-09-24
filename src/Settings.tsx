@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./App";
 import "./App.css";
 import { webServerUrl } from "./constants";
+import { wallet } from "./main";
 
 function Settings(props: any) {
   const user = useContext(UserContext);
@@ -49,7 +50,19 @@ function Settings(props: any) {
     }
   };
 
-  const connectNearWallet = async () => {};
+  const connectNearWallet = async () => {
+    const isSignedIn = await wallet.startUp();
+    console.log("isSignedIn:", isSignedIn);
+
+    if (!isSignedIn) {
+      console.log("signing in");
+      wallet.signIn();
+    } else {
+      console.log("signing out");
+      wallet.signOut();
+      user.nearSignedIn = false;
+    }
+  };
 
   const back = async () => {
     props.back();
@@ -72,7 +85,9 @@ function Settings(props: any) {
         <br />
         <button onClick={save}>Save</button>
         <br />
-        <button onClick={connectNearWallet}>Connect NEAR Wallet</button>
+        <button onClick={connectNearWallet}>
+          {user.nearSignedIn ? "Disconnect Near Wallet" : "Connect NEAR Wallet"}
+        </button>
         <br />
         <button onClick={back}>Back</button>
       </header>

@@ -1,74 +1,44 @@
-import { Drone, State } from "@node-tello/drone";
-import { IDroneOptions } from "@node-tello/drone/dist/Drone";
+import Dexie from "dexie";
+//@ts-ignore
+import JMuxer from "jmuxer";
+
+const min_axe = 0.1;
+const max_axe = 0.9;
 
 export default class tello_drone {
-  drone: Drone | null = null;
-  initialized: boolean = false;
-  isAirborn: boolean = false;
+  db = new Dexie("tello");
 
-  constructor(options?: IDroneOptions) {
-    this.initDrone(options);
+  public_axes = [];
+  public_axes_actions = [];
+  public_buttons = [];
+  public_buttons_prev = [];
+  public_cmd_prev = "";
+  public_buttons_actions = [];
+
+  ws: WebSocket;
+
+  constructor(wsAddress = "ws://localhost:8080") {
+    this.ws = new WebSocket(wsAddress);
+    this.ws.addEventListener("open", (e) => {
+      this.ws.send(JSON.stringify({ action: "command", data: "command" }));
+    });
+    this.ws.addEventListener("message", (e) => {
+      const _data = JSON.parse(e.data);
+      if (_data.hasOwnProperty("status")) {
+        const status = _data.status;
+        const battery = _data.status.battery;
+      } else if (_data.hasOwnProperty("video")) {
+        const buffer = new Uint8Array(_data.video.data);
+        //duration: 100
+      }
+    });
+    this.ws.addEventListener("error", (e) => {
+      console.log("Socket Error:", e);
+    });
+    this.ws.addEventListener("close", (e) => {
+      console.log("socket closed");
+    });
   }
 
-  initDrone = async (options?: IDroneOptions) => {
-    this.drone = new Drone(options);
-
-    await this.drone.initalise();
-    this.initialized = true;
-  };
-
-  disconnectDrone = async () => {
-    if (!this.drone || !this.initialized) {
-      return;
-    }
-
-    await this.land();
-    this.drone.disconnect();
-    this.initialized = false;
-    this.isAirborn = false;
-  };
-
-  getSerialNumber = async () => {
-    if (!this.drone || !this.initialized) {
-      return "";
-    }
-
-    return await this.drone?.getSerialNumber();
-  };
-
-  takeOff = async () => {
-    if (!this.drone || !this.initialized || this.isAirborn) {
-      return;
-    }
-
-    await this.drone.takeoff();
-  };
-
-  land = async () => {
-    if (!this.drone || !this.initialized || !this.isAirborn) {
-      return;
-    }
-
-    await this.drone.land();
-  };
-
-  getStats = async () => {
-    const stats = {
-      initialized: this.initialized,
-      airborn: this.isAirborn,
-      batery: "0",
-      speed: "0",
-      time: "0",
-    };
-
-    if (!this.drone || !this.initialized) {
-      return;
-    }
-
-    stats.batery = await this.drone.getBattery();
-    stats.speed = await this.drone.getSpeed();
-    stats.time = await this.drone.getTime();
-
-    return stats;
-  };
+  sendData() {}
 }

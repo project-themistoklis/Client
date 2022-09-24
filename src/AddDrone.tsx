@@ -1,4 +1,6 @@
 import { useState } from "react";
+import AddDJIDrone from "./AddDJIDrone";
+import AddTelloDrone from "./AddTelloDrone";
 import "./App.css";
 
 function AddDrone(props: any) {
@@ -8,9 +10,9 @@ function AddDrone(props: any) {
     return (
       <div>
         {droneType === "Tello" ? (
-          <div>Not Supported Yet!</div>
+          <AddTelloDrone />
         ) : droneType === "DJI" ? (
-          <div>Not Supported Yet!</div>
+          <AddDJIDrone />
         ) : (
           <div>
             <button

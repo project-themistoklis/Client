@@ -50,7 +50,7 @@ function LoginPage(props: any) {
             user.username = username;
             user.settings = resp.data.settings;
             user.uuid = resp.data.uuid;
-            props.loginHandler();
+            props.loginHandler(true);
           }
         } else {
           const resp = await axios.post(webServerUrl + "/loginWithPin", {
@@ -62,7 +62,7 @@ function LoginPage(props: any) {
             user.uuid = uuid;
             user.username = resp.data.info;
             user.settings = resp.data.settings;
-            props.loginHandler();
+            props.loginHandler(true);
           }
         }
       }
@@ -72,8 +72,6 @@ function LoginPage(props: any) {
       params: { uuid: user.uuid },
       headers: { "Content-Type": "application/json" },
     });
-
-    console.log(resp.data);
 
     if (resp.data.success) {
       setHasPin(true);
@@ -148,7 +146,7 @@ function LoginPage(props: any) {
       user.username = temp;
       user.settings = resp.data.settings;
       user.uuid = resp.data.uuid;
-      props.loginHandler();
+      props.loginHandler(true);
     } else {
       setError(resp.data.error);
       if (!saveCreds) {
@@ -156,6 +154,7 @@ function LoginPage(props: any) {
         localStorage.removeItem(storage_prefix + "password");
         localStorage.removeItem(storage_prefix + "saveCreds");
       }
+      props.loginHandler(false);
     }
   };
 
@@ -190,9 +189,10 @@ function LoginPage(props: any) {
         xor(user.uuid, xor_key)
       );
       console.log("logged in");
-      props.loginHandler();
+      props.loginHandler(true);
     } else {
       setError(resp.data.error);
+      props.loginHandler(false);
     }
   };
 
