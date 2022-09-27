@@ -2,12 +2,20 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "./App";
 import "./App.css";
-import { webServerUrl } from "./constants";
+import { wallet_connect_contract_id, webServerUrl } from "./constants";
 import { wallet } from "./main";
+
+import {getState, walletLogin} from './DeployContract';
 
 function Settings(props: any) {
   const user = useContext(UserContext);
   const [settings, setSettings] = useState(null);
+
+  // console.log(wallet.wallet);
+  const sendData = () => {
+    getState(wallet, [0]);
+    // sendTransactions(wallet);
+  }
 
   useEffect(() => {
     setSettings(
@@ -15,6 +23,7 @@ function Settings(props: any) {
         ? JSON.parse(user.settings)
         : (user.settings as any)
     );
+    
   }, []);
 
   const renderSettings = () => {
@@ -31,6 +40,7 @@ function Settings(props: any) {
             return (
               <div key={i}>
                 <label>{val}</label>
+
                 <input
                   value={settings[val]}
                   onChange={(e) => {
@@ -63,7 +73,7 @@ function Settings(props: any) {
       user.nearSignedIn = false;
     }
   };
-
+  
   const back = async () => {
     props.back();
   };
@@ -82,6 +92,8 @@ function Settings(props: any) {
     <div className="App">
       <header className="App-header">
         {renderSettings()}
+        <button onClick={sendData}>send</button>
+        <button onClick={walletLogin}>Wallet-Login</button>
         <br />
         <button onClick={save}>Save</button>
         <br />
