@@ -29,14 +29,17 @@ export const getState = async (account: any, fire_data: [number]) => {
             args: {}
         });
         console.log(deployed);
-        if (deployed) updateContract(account);
+        if (deployed) updateContract(account, fire_data);
     }
     catch (err: any) {
         console.log(err.message);
         let error = err.message;
         if (error.indexOf("CodeDoesNotExist") > 0) sendTransactions(account.accountId);
         else if (error.indexOf("MethodNotFound") > 0) console.log("Other contract already exist.")
-        else if (error.indexOf("initialized") > 0) initContract(account);
+        else if (error.indexOf("initialized") > 0) {
+            initContract(account);
+            getState(account, fire_data);
+        }
     }
 };
 
@@ -65,11 +68,11 @@ async function initContract(account: any) {
     });
 }
 
-async function updateContract(account: any) {
+async function updateContract(account: any, fire_data: any) {
     await account.callMethod({
         contractId: account.accountId,
         method: "update",
-        args: { "fire_data": [9] },
+        args: { "fire_data": fire_data },
         gas: "300000000000000",
         deposit: "0"
     });

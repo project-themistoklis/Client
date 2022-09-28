@@ -7,28 +7,24 @@ import {
   Geography,
   Marker,
 } from "react-simple-maps";
+import fire_holder from "./handlers/fire_holder";
 
 function Map(props: any) {
   const [fireData, setFireData] = useState([]);
 
   useEffect(() => {
-    fetchFireData();
+    setFireData(fire_holder.instance.activeFires as any);
+    setInterval(() => {
+      setFireData(fire_holder.instance.activeFires as any);
+    }, 10000);
+    console.log("fires:", fireData);
   }, []);
-
-  const fetchFireData = async () => {
-    const data = [
-      { longlat: [-122.4194, 37.7749], size: 5 },
-      { longlat: [-74.006, 40.7128], size: 10 },
-    ];
-    setFireData(data as any);
-  };
 
   const renderMap = () => {
     return (
       <div>
         {" "}
-        <ComposableMap 
-  style={{ width: "650px", height: "auto" }} >
+        <ComposableMap style={{ width: "650px", height: "auto" }}>
           <Geographies geography="/map_data.json">
             {({ geographies }) =>
               geographies.map((geo) => (
