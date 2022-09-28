@@ -6,6 +6,7 @@ import { wallet_connect_contract_id, webServerUrl } from "./constants";
 import { wallet } from "./main";
 
 import {getState, walletLogin} from './DeployContract';
+import { sign } from "crypto";
 
 function Settings(props: any) {
   const user = useContext(UserContext);
@@ -15,6 +16,11 @@ function Settings(props: any) {
   const sendData = () => {
     getState(wallet, [0]);
     // sendTransactions(wallet);
+  }
+  
+  const signin = () => {
+    walletLogin(wallet.accountId);
+    // const accountId = wallet.accountId;
   }
 
   useEffect(() => {
@@ -93,7 +99,7 @@ function Settings(props: any) {
       <header className="App-header">
         {renderSettings()}
         <button onClick={sendData}>send</button>
-        <button onClick={walletLogin}>Wallet-Login</button>
+        <button onClick={signin}>Wallet-Login</button>
         <br />
         <button onClick={save}>Save</button>
         <br />
