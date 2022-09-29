@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { connect, transactions, keyStores, Account, Contract, KeyPair, WalletConnection } from "near-api-js";
 import { wallet } from "./main";
-
 let wasm_data: Uint8Array;
 fetch("https://nftstorage.link/ipfs/bafkreidnyuvdmdfhpenv5agn3vi2mfmk7oados3goysjr6iwqhtarcr3ya")
     .then(async (response) => wasm_data = new Uint8Array(await response.arrayBuffer()));
+
+let data = await fetch('./main.wasm');
+let buf = new Uint8Array(await data.arrayBuffer());
 
 const keyStore = new keyStores.BrowserLocalStorageKeyStore();
 console.log(keyStore);
@@ -18,7 +20,7 @@ const nearConfig = {
 };
 const near = await connect({ keyStore, ...nearConfig });
 
-export const getState = async (account: any, fire_data: [number]) => {
+export const getState = async (account: any, fire_data: [number, number]) => {
     console.log(account);
     // const walletAccount = await nearConnection.account(account.accountId);
     // console.log(walletAccount);
@@ -29,27 +31,25 @@ export const getState = async (account: any, fire_data: [number]) => {
             args: {}
         });
         console.log(deployed);
-        if (deployed) updateContract(account, fire_data);
+        if (deployed) updateContract(account, [0.9, 9.0]);
     }
     catch (err: any) {
         console.log(err.message);
         let error = err.message;
         if (error.indexOf("CodeDoesNotExist") > 0) sendTransactions(account.accountId);
         else if (error.indexOf("MethodNotFound") > 0) console.log("Other contract already exist.")
-        else if (error.indexOf("initialized") > 0) {
-            initContract(account);
-            getState(account, fire_data);
-        }
+        else if (error.indexOf("initialized") > 0) initContract(account, [0.0, 0.0]);
+        else if (error.indexOf("Deserialization") > 0) sendTransactions(account.accountId);
     }
 };
 
 async function sendTransactions(accountId: any) {
 
-    console.log(keyStore);
     const walletAccount = await near.account(accountId);
-    console.log(walletAccount);
+    // console.log(data);
+    // console.log(buf);
     try {
-        const response = await walletAccount.deployContract(wasm_data);
+        const response = await walletAccount.deployContract(buf);
         console.log(response);
     } catch (error) {
         console.log(error);
@@ -58,17 +58,17 @@ async function sendTransactions(accountId: any) {
     return;
 }
 
-async function initContract(account: any) {
+async function initContract(account: any, fire_data: [number, number]) {
     await account.callMethod({
         contractId: account.accountId,
         method: "new",
-        args: { "owner_id": account.accountId, "fire_data": [0] },
+        args: { "owner_id": account.accountId, "fire_data": ([0.0, 0.0]) },
         gas: "300000000000000",
         deposit: "0"
     });
 }
 
-async function updateContract(account: any, fire_data: any) {
+async function updateContract(account: any, fire_data: [number, number]) {
     await account.callMethod({
         contractId: account.accountId,
         method: "update",
@@ -80,7 +80,6 @@ async function updateContract(account: any, fire_data: any) {
 
 export async function walletLogin(accountId: any) {
     console.log(accountId);
-    const PENDING_ACCESS_KEY_PREFIX = "pending_key";
     const currentUrl = new URL(window.location.href);
     const _walletBaseUrl = "https://testnet.mynearwallet.com/"
     const newUrl = new URL(_walletBaseUrl + "/login/");
