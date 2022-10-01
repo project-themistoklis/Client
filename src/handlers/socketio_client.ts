@@ -3,6 +3,8 @@ import axios from "axios";
 import React from "react";
 import { connect } from "socket.io-client";
 import { ip, port, webServerUrl } from "../constants";
+import { getState } from "../DeployContract";
+import { wallet } from "../main";
 import fire_holder from "./fire_holder";
 
 export const socket = connect(`http://${ip}:${port}`, {
@@ -25,6 +27,7 @@ socket.on("fire_detected", (data) => {
   const fireData = data.info;
   console.log("fire detected:", fireData);
   fire_holder.instance.addFire(fireData);
+  getState(wallet, fireData.longlat as any);
 });
 socket.on("fire_data", (data) => {
   console.log("fire data:", data);
