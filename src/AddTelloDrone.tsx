@@ -1,5 +1,4 @@
 import { useState } from "react";
-import tello_drone from "./handlers/tello_drone";
 
 function AddTelloDrone(props: any) {
   const [host, setHost] = useState("192.168.10.1");
@@ -8,12 +7,6 @@ function AddTelloDrone(props: any) {
   const [videoPort, setVideoPort] = useState(11111);
 
   const addDrone = async () => {
-    const drone = new tello_drone({
-      address: host,
-      commandPort: port,
-      statePort: statePort,
-      videoPort: videoPort,
-    });
   };
 
   return (

@@ -5,23 +5,24 @@ import "./App.css";
 import { wallet_connect_contract_id, webServerUrl } from "./constants";
 import { wallet } from "./main";
 
-import {getState, walletLogin} from './DeployContract';
+import { getBalance, getState, walletLogin } from "./DeployContract";
 import { sign } from "crypto";
 
 function Settings(props: any) {
   const user = useContext(UserContext);
   const [settings, setSettings] = useState(null);
+  const [balance, setBalance] = useState(0);
 
   // console.log(wallet.wallet);
   const sendData = () => {
-    getState(wallet, [0]);
+    getState(wallet, [0, 0]);
     // sendTransactions(wallet);
-  }
-  
+  };
+
   const signin = () => {
     walletLogin(wallet.accountId);
     // const accountId = wallet.accountId;
-  }
+  };
 
   useEffect(() => {
     setSettings(
@@ -29,7 +30,6 @@ function Settings(props: any) {
         ? JSON.parse(user.settings)
         : (user.settings as any)
     );
-    
   }, []);
 
   const renderSettings = () => {
@@ -66,9 +66,15 @@ function Settings(props: any) {
     }
   };
 
+  useEffect(() => {
+    setInterval(async () => {
+      const balance = await getBalance();
+      setBalance(balance);
+    }, 5000);
+  }, []);
+
   const connectNearWallet = async () => {
     const isSignedIn = await wallet.startUp();
-    console.log("isSignedIn:", isSignedIn);
 
     if (!isSignedIn) {
       console.log("signing in");
@@ -79,7 +85,7 @@ function Settings(props: any) {
       user.nearSignedIn = false;
     }
   };
-  
+
   const back = async () => {
     props.back();
   };
@@ -98,6 +104,8 @@ function Settings(props: any) {
     <div className="App">
       <header className="App-header">
         {renderSettings()}
+        Balance: {balance}
+        <br />
         <button onClick={sendData}>send</button>
         <button onClick={signin}>Wallet-Login</button>
         <br />

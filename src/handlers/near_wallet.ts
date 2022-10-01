@@ -2,15 +2,6 @@
 
 // near api js
 import { providers } from "near-api-js";
-import { connect, Contract, Near, WalletConnection, transactions } from "near-api-js";
-import {
-  app_name,
-  nearNetwork,
-  near_app_prefix,
-  near_connection_config,
-  storage_prefix,
-  wallet_connect_contract_id,
-} from "../constants";
 
 // wallet selector UI
 import "@near-wallet-selector/modal-ui/styles.css";
